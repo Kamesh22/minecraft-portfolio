@@ -1,37 +1,37 @@
-/* ===== TERMINAL CONTAINER ===== */
 .terminal {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--color-terminal-bg);
+  background:
+    linear-gradient(180deg, rgba(106, 166, 83, 0.08), rgba(106, 166, 83, 0)),
+    var(--color-terminal-bg);
   position: relative;
   overflow: hidden;
   cursor: text;
 }
 
-/* ===== SCANLINE EFFECT ===== */
-.terminal-scanlines {
+.terminal::before {
+  content: '';
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.08) 2px,
-    rgba(0, 0, 0, 0.08) 4px
+    transparent 3px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
   );
-  pointer-events: none;
-  z-index: 5;
+  opacity: 0.5;
 }
 
-/* ===== TITLE BAR ===== */
 .terminal-titlebar {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 16px;
-  background: linear-gradient(180deg, #1a2a1a 0%, #0e1a0e 100%);
+  padding: 11px 16px;
+  background: rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid var(--color-terminal-border);
   flex-shrink: 0;
   user-select: none;
@@ -43,156 +43,125 @@
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   display: inline-block;
 }
 
 .dot.red {
-  background: #ff5f56;
-  box-shadow: 0 0 6px rgba(255, 95, 86, 0.4);
+  background: #d36b5d;
 }
 
 .dot.yellow {
-  background: #ffbd2e;
-  box-shadow: 0 0 6px rgba(255, 189, 46, 0.4);
+  background: #d8b35f;
 }
 
 .dot.green {
-  background: #27c93f;
-  box-shadow: 0 0 6px rgba(39, 201, 63, 0.4);
+  background: #6aa653;
 }
 
 .terminal-titlebar-text {
-  font-family: var(--font-terminal);
+  color: rgba(230, 223, 208, 0.58);
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.5px;
 }
 
-/* ===== TERMINAL BODY ===== */
 .terminal-body {
+  position: relative;
+  z-index: 1;
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  scroll-behavior: smooth;
+  padding: 18px;
 }
 
-/* ===== OUTPUT LINES ===== */
+.terminal-line,
+.terminal-input-line {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.28;
+  color: var(--color-terminal-text);
+  white-space: pre-wrap;
+}
+
 .terminal-line {
-  font-family: var(--font-terminal);
-  font-size: 18px;
-  line-height: 1.5;
-  color: var(--color-green);
-  white-space: pre;
-  text-shadow: 0 0 8px var(--color-green-glow);
-  min-height: 1.5em;
+  min-height: 1.28em;
 }
 
-/* ===== INPUT LINE ===== */
 .terminal-input-line {
   display: flex;
   align-items: center;
-  font-family: var(--font-terminal);
-  font-size: 18px;
-  color: var(--color-green);
   white-space: pre;
 }
 
 .terminal-prompt {
   flex-shrink: 0;
-  text-shadow: 0 0 8px var(--color-green-glow);
 }
 
-/* Input area: wraps the mirror + input + cursor together inline */
 .terminal-input-area {
   display: inline-flex;
   align-items: center;
   position: relative;
+  min-width: 2px;
   overflow: hidden;
 }
 
-/* Hidden mirror span — same font styling, used to measure text width */
 .terminal-mirror {
   position: absolute;
   visibility: hidden;
   white-space: pre;
-  font-family: var(--font-terminal);
-  font-size: 18px;
-  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 22px;
   height: 0;
   overflow: hidden;
 }
 
 .terminal-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--font-terminal);
-  font-size: 18px;
-  color: var(--color-green);
-  caret-color: transparent;
-  text-shadow: 0 0 8px var(--color-green-glow);
-  padding: 0;
+  min-width: 2px;
   margin: 0;
-  min-width: 1px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--color-terminal-text);
+  background: transparent;
+  caret-color: transparent;
+  font-family: var(--font-display);
+  font-size: 22px;
 }
 
-/* ===== BLINKING CURSOR — RIGHT AFTER TEXT ===== */
 .terminal-cursor {
   display: inline-block;
-  width: 10px;
-  height: 20px;
-  background: var(--color-green);
+  width: 9px;
+  height: 21px;
+  background: var(--color-terminal-text);
   animation: blink 1s step-end infinite;
-  vertical-align: middle;
-  box-shadow: 0 0 10px var(--color-green-glow);
   flex-shrink: 0;
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }
 }
 
-/* ===== CRT GLOW BORDER EFFECT ===== */
-.terminal::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(0, 255, 65, 0.1);
-  box-shadow:
-    inset 0 0 60px rgba(0, 255, 65, 0.03),
-    0 0 20px rgba(0, 255, 65, 0.02);
-  pointer-events: none;
-  z-index: 4;
-  border-radius: inherit;
-}
+@media (max-width: 680px) {
+  .terminal-body {
+    padding: 14px;
+  }
 
-/* ===== SUBTLE FLICKER ANIMATION ===== */
-.terminal::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 255, 65, 0.01);
-  pointer-events: none;
-  z-index: 3;
-  animation: flicker 4s linear infinite;
-  border-radius: inherit;
-}
+  .terminal-line,
+  .terminal-input-line,
+  .terminal-input,
+  .terminal-mirror {
+    font-size: 19px;
+  }
 
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  3% { opacity: 0.95; }
-  6% { opacity: 1; }
-  7% { opacity: 0.9; }
-  8% { opacity: 1; }
-  50% { opacity: 1; }
-  52% { opacity: 0.96; }
-  53% { opacity: 1; }
+  .terminal-input-line {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
 }
