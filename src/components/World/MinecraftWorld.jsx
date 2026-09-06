@@ -1,96 +1,116 @@
-import { Canvas } from '@react-three/fiber'
-import { Sky, OrbitControls } from '@react-three/drei'
-import { useState, useCallback, useMemo, Suspense } from 'react'
+import { Canvas, useLoader } from '@react-three/fiber'
+import { OrbitControls, Sky } from '@react-three/drei'
+import { Suspense, useCallback, useMemo, useState } from 'react'
+import * as THREE from 'three'
 import Block from './Block'
 import './MinecraftWorld.css'
 
-/* ===== ISLAND GENERATION ===== */
-function generateIsland() {
-  const blocks = []
-  const key = (x, y, z) => `${x},${y},${z}`
-
-  // Layer 0 (bottom) — large base
-  for (let x = -4; x <= 4; x++) {
-    for (let z = -4; z <= 4; z++) {
-      const dist = Math.sqrt(x * x + z * z)
-      if (dist <= 4.5) {
-        blocks.push({ pos: [x, -3, z], type: 'dirt' })
-      }
-    }
-  }
-
-  // Layer 1 — slightly smaller
-  for (let x = -3; x <= 3; x++) {
-    for (let z = -3; z <= 3; z++) {
-      const dist = Math.sqrt(x * x + z * z)
-      if (dist <= 3.8) {
-        blocks.push({ pos: [x, -2, z], type: 'dirt' })
-      }
-    }
-  }
-
-  // Layer 2 — medium
-  for (let x = -3; x <= 3; x++) {
-    for (let z = -3; z <= 3; z++) {
-      const dist = Math.sqrt(x * x + z * z)
-      if (dist <= 3.2) {
-        blocks.push({ pos: [x, -1, z], type: 'dirt' })
-      }
-    }
-  }
-
-  // Layer 3 — grass top
-  for (let x = -2; x <= 2; x++) {
-    for (let z = -2; z <= 2; z++) {
-      const dist = Math.sqrt(x * x + z * z)
-      if (dist <= 2.8) {
-        blocks.push({ pos: [x, 0, z], type: 'grass' })
-      }
-    }
-  }
-
-  // Small hill
-  blocks.push({ pos: [1, 1, 0], type: 'grass' })
-  blocks.push({ pos: [1, 1, 1], type: 'grass' })
-  blocks.push({ pos: [0, 1, 1], type: 'grass' })
-
-  // Tree trunk (at -1, 0, -1)
-  blocks.push({ pos: [-1, 1, -1], type: 'dirt' })
-  blocks.push({ pos: [-1, 2, -1], type: 'dirt' })
-  blocks.push({ pos: [-1, 3, -1], type: 'dirt' })
-
-  // Tree leaves (simple cross pattern)
-  const leafCenter = [-1, 4, -1]
-  for (let dx = -1; dx <= 1; dx++) {
-    for (let dz = -1; dz <= 1; dz++) {
-      blocks.push({
-        pos: [leafCenter[0] + dx, leafCenter[1], leafCenter[2] + dz],
-        type: 'grass',
-      })
-    }
-  }
-  blocks.push({ pos: [-1, 5, -1], type: 'grass' })
-
-  // Bottom stalactites for floating effect
-  blocks.push({ pos: [0, -4, 0], type: 'dirt' })
-  blocks.push({ pos: [1, -4, 1], type: 'dirt' })
-  blocks.push({ pos: [-1, -4, -1], type: 'dirt' })
-  blocks.push({ pos: [0, -5, 0], type: 'dirt' })
-
-  // Convert to map
-  const blockMap = new Map()
-  blocks.forEach((b) => {
-    blockMap.set(key(b.pos[0], b.pos[1], b.pos[2]), b.type)
-  })
-
-  return blockMap
+function blockKey(x, y, z) {
+  return `${x},${y},${z}`
 }
 
-/* ===== MAIN WORLD COMPONENT ===== */
+function addBlock(blocks, x, y, z, type) {
+  blocks.set(blockKey(x, y, z), type)
+}
+
+function addCuboid(blocks, from, to, type) {
+  for (let x = from[0]; x <= to[0]; x++) {
+    for (let y = from[1]; y <= to[1]; y++) {
+      for (let z = from[2]; z <= to[2]; z++) {
+        addBlock(blocks, x, y, z, type)
+      }
+    }
+  }
+}
+
+function generateIsland() {
+  const blocks = new Map()
+
+  for (let x = -5; x <= 5; x++) {
+    for (let z = -4; z <= 4; z++) {
+      const dist = Math.sqrt((x / 5.2) ** 2 + (z / 4.2) ** 2)
+      if (dist <= 1.05) {
+        addBlock(blocks, x, 0, z, 'grass')
+      }
+      if (dist <= 0.98) {
+        addBlock(blocks, x, -1, z, 'dirt')
+      }
+      if (dist <= 0.82) {
+        addBlock(blocks, x, -2, z, 'dirt')
+      }
+    }
+  }
+
+  addBlock(blocks, 0, -3, 0, 'dirt')
+  addBlock(blocks, 1, -3, 1, 'dirt')
+  addBlock(blocks, -1, -3, -1, 'dirt')
+  addBlock(blocks, 0, -4, 0, 'dirt')
+
+  for (let z = -4; z <= 3; z++) {
+    addBlock(blocks, 0, 1, z, 'stone')
+  }
+
+  addCuboid(blocks, [-4, 1, 0], [-1, 1, 3], 'plank')
+  addCuboid(blocks, [-4, 2, 0], [-1, 3, 0], 'plank')
+  addCuboid(blocks, [-4, 2, 3], [-1, 3, 3], 'plank')
+  addCuboid(blocks, [-4, 2, 0], [-4, 3, 3], 'plank')
+  addCuboid(blocks, [-1, 2, 0], [-1, 3, 3], 'plank')
+  addBlock(blocks, -2, 2, 0, 'glass')
+  addBlock(blocks, -3, 2, 3, 'glass')
+  addBlock(blocks, -2, 2, 3, 'glass')
+  addBlock(blocks, -2, 2, 0, 'glass')
+  addBlock(blocks, -2, 2, 1, 'dirt')
+  addBlock(blocks, -2, 3, 1, 'plank')
+
+  for (let x = -5; x <= 0; x++) {
+    for (let z = -1; z <= 4; z++) {
+      if (x >= -4 && x <= -1 && z >= 0 && z <= 3) continue
+      if (Math.abs(x + 2.5) + Math.abs(z - 1.5) <= 4.2) {
+        addBlock(blocks, x, 4, z, 'roof')
+      }
+    }
+  }
+  addCuboid(blocks, [-4, 5, 1], [-1, 5, 2], 'roof')
+
+  addCuboid(blocks, [3, 1, 1], [3, 4, 1], 'wood')
+  for (let x = 1; x <= 5; x++) {
+    for (let y = 4; y <= 6; y++) {
+      for (let z = -1; z <= 3; z++) {
+        const dist = Math.abs(x - 3) + Math.abs(y - 5) + Math.abs(z - 1)
+        if (dist <= 4) {
+          addBlock(blocks, x, y, z, 'leaf')
+        }
+      }
+    }
+  }
+
+  addBlock(blocks, 2, 1, -2, 'pants')
+  addBlock(blocks, 2, 2, -2, 'shirt')
+  addBlock(blocks, 2, 3, -2, 'wood')
+  addBlock(blocks, 1, 2, -2, 'shirt')
+  addBlock(blocks, 3, 2, -2, 'shirt')
+
+  return blocks
+}
+
+function CharacterFace() {
+  const loadedFaceTexture = useLoader(THREE.TextureLoader, import.meta.env.BASE_URL + 'person/person.png')
+  const faceTexture = useMemo(() => {
+    const texture = loadedFaceTexture.clone()
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.needsUpdate = true
+    return texture
+  }, [loadedFaceTexture])
+
+  return (
+    <sprite position={[2, 3.3, -2.54]} scale={[0.95, 0.95, 1]}>
+      <spriteMaterial map={faceTexture} transparent />
+    </sprite>
+  )
+}
+
 function MinecraftWorld() {
   const [blocks, setBlocks] = useState(() => generateIsland())
-
-  const blockKey = useCallback((x, y, z) => `${x},${y},${z}`, [])
 
   const handleBlockClick = useCallback((position, faceNormal, shiftKey) => {
     setBlocks((prev) => {
@@ -98,69 +118,57 @@ function MinecraftWorld() {
       const [x, y, z] = position
 
       if (shiftKey) {
-        // Remove the clicked block
         next.delete(blockKey(x, y, z))
-      } else {
-        // Place a new block adjacent to the clicked face
-        const newPos = [
-          x + Math.round(faceNormal[0]),
-          y + Math.round(faceNormal[1]),
-          z + Math.round(faceNormal[2]),
-        ]
-        const key = blockKey(newPos[0], newPos[1], newPos[2])
-        if (!next.has(key)) {
-          // Place grass if on top, dirt otherwise
-          next.set(key, faceNormal[1] > 0.5 ? 'grass' : 'dirt')
-        }
+        return next
+      }
+
+      const newPos = [
+        x + Math.round(faceNormal[0]),
+        y + Math.round(faceNormal[1]),
+        z + Math.round(faceNormal[2]),
+      ]
+      const key = blockKey(newPos[0], newPos[1], newPos[2])
+      if (!next.has(key)) {
+        next.set(key, faceNormal[1] > 0.5 ? 'grass' : 'dirt')
       }
       return next
     })
-  }, [blockKey])
+  }, [])
 
-  // Convert map to renderable array
   const blockArray = useMemo(() => {
-    const arr = []
-    blocks.forEach((type, key) => {
+    return Array.from(blocks, ([key, type]) => {
       const [x, y, z] = key.split(',').map(Number)
-      arr.push({ key, pos: [x, y, z], type })
+      return { key, pos: [x, y, z], type }
     })
-    return arr
   }, [blocks])
 
   return (
     <div className="minecraft-world" id="minecraft-world">
-      <Canvas
-        camera={{ position: [10, 8, 10], fov: 50 }}
-        gl={{ antialias: true }}
-        shadows
-      >
+      <Canvas camera={{ position: [10, 8, 11], fov: 48 }} gl={{ antialias: true }} shadows>
         <Suspense fallback={null}>
-          {/* Sky */}
           <Sky
             distance={450000}
             sunPosition={[100, 50, 100]}
-            inclination={0.6}
+            inclination={0.58}
             azimuth={0.25}
             turbidity={8}
             rayleigh={2}
           />
 
-          {/* Lighting */}
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.55} />
           <directionalLight
-            position={[10, 15, 10]}
-            intensity={1.5}
+            position={[10, 16, 10]}
+            intensity={1.55}
             castShadow
             shadow-mapSize={[1024, 1024]}
-            shadow-camera-far={50}
-            shadow-camera-left={-10}
-            shadow-camera-right={10}
-            shadow-camera-top={10}
-            shadow-camera-bottom={-10}
+            shadow-camera-far={60}
+            shadow-camera-left={-12}
+            shadow-camera-right={12}
+            shadow-camera-top={12}
+            shadow-camera-bottom={-12}
           />
-          <pointLight position={[-5, 10, -5]} intensity={0.3} color="#ffeecc" />
+          <pointLight position={[-5, 9, -5]} intensity={0.35} color="#ffeecc" />
 
-          {/* Blocks */}
           {blockArray.map((block) => (
             <Block
               key={block.key}
@@ -170,12 +178,13 @@ function MinecraftWorld() {
             />
           ))}
 
-          {/* Controls */}
+          <CharacterFace />
+
           <OrbitControls
             enablePan={false}
-            minDistance={5}
+            minDistance={7}
             maxDistance={25}
-            target={[0, 0, 0]}
+            target={[0, 1.3, 0]}
             enableDamping
             dampingFactor={0.1}
           />

@@ -6,6 +6,7 @@ const RESUME_DATA = {
     '',
     'Kamesh Rajaram',
     'Backend engineer focused on Java, Spring Boot, API security, and microservices.',
+    'I use Python automation, Azure tools, and AI-assisted workflows to ship faster.',
     'Currently building enterprise insurance platform features at TCS.',
     '',
   ],
@@ -15,7 +16,7 @@ const RESUME_DATA = {
     '- Java, Spring Boot, Spring Security, Hibernate',
     '- Microservices, REST APIs, JWT, OAuth2, RBAC',
     '- PostgreSQL, Redis, Azure, Dynatrace, App Insights',
-    '- React, Vite, Three.js for frontend experiments',
+    '- Python, GitHub Copilot, ML and GenAI fundamentals',
     '',
   ],
   projects: [
@@ -29,9 +30,10 @@ const RESUME_DATA = {
   impact: [
     '',
     'Impact signals',
-    '- Contributed to 3000+ unit tests using JUnit and Mockito',
-    '- Migrated 3500+ automation test cases across priority-1 pipelines',
-    '- Delivered Spring Boot microservice ownership from API design to config',
+    '- Use AI coding tools to speed up implementation, debugging, and documentation',
+    '- Use Python scripts to automate repetitive manual tasks in daily engineering work',
+    '- Delivered Spring Boot microservice ownership from API design to service config',
+    '- Recognized with a Star Team Award for contribution and delivery quality',
     '',
   ],
   contact: [

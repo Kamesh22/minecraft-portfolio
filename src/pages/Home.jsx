@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Terminal from '../components/Terminal/Terminal'
 import MinecraftWorld from '../components/World/MinecraftWorld'
 import './Home.css'
@@ -9,14 +10,15 @@ const EXPERIENCE = [
     period: 'Nov 2024 - Present',
     location: 'Bengaluru, KA',
     summary:
-      'Building Spring Boot microservices and React features for enterprise insurance platforms.',
+      'Building Spring Boot microservices and React features for enterprise insurance platforms with a focus on secure APIs and fast delivery.',
     achievements: [
       'Owned REST API design, error handling, service configuration, and initial microservice delivery.',
       'Implemented Azure AD OAuth2 and JWT security flows for pre-production environments.',
       'Improved latency using Redis caching, Azure App Insights, and Dynatrace investigation.',
-      'Contributed to 3000+ JUnit and Mockito tests with 100% CSS delivery for project scope.',
+      'Used GitHub Copilot and focused automation habits to move faster through boilerplate, tests, and delivery tasks.',
+      'Recognized with a Star Team Award for contribution and delivery quality.',
     ],
-    tech: ['Java', 'Spring Boot', 'Microservices', 'Azure', 'Redis', 'React'],
+    tech: ['Java', 'Spring Boot', 'Microservices', 'Azure', 'Redis', 'GitHub Copilot', 'React'],
   },
   {
     company: 'Nokia Networks',
@@ -27,6 +29,7 @@ const EXPERIENCE = [
       'Migrated telecom automation workflows from Java/Jython to Python and Robot Framework.',
     achievements: [
       'Migrated 3500+ automation test cases with zero functional impact across 3 priority-1 pipelines.',
+      'Used Python to automate repetitive manual work and speed up day-to-day engineering tasks.',
       'Supported Jenkins pipeline work while gaining hands-on Docker and Kubernetes exposure.',
       'Improved maintainability by moving legacy automation logic into clearer Python test assets.',
     ],
@@ -72,20 +75,26 @@ const PROJECTS = [
 
 const STRENGTHS = [
   {
-    title: 'Backend systems',
-    text: 'Spring Boot services, REST APIs, service configuration, and microservice boundaries.',
+    title: 'AI-assisted shipping',
+    text: 'Use GitHub Copilot and GenAI tools to speed up implementation, documentation, boilerplate, and debugging while keeping code review and design judgment central.',
   },
   {
-    title: 'Security',
-    text: 'JWT, OAuth2, RBAC, method-level authorization, and data ownership rules.',
+    title: 'Python automation',
+    text: 'Use Python to reduce repetitive manual work, migrate test assets, and turn everyday engineering chores into reusable scripts.',
   },
   {
-    title: 'Production thinking',
-    text: 'Caching, observability, testing, CI/CD exposure, and performance investigation.',
+    title: 'Cloud and ML-aware',
+    text: 'Hands-on Azure exposure with working knowledge of ML concepts, GenAI fundamentals, observability, and production backend delivery.',
   },
 ]
 
-const CERTIFICATIONS = ['Azure AI Fundamentals (AI-900)', 'GitHub Copilot (GH-300)', 'Azure Fundamentals (AZ-900)']
+const CERTIFICATIONS = [
+  'Star Team Award',
+  'Azure AI Fundamentals (AI-900)',
+  'GitHub Copilot (GH-300)',
+  'Azure Fundamentals (AZ-900)',
+  'Claude Certified Developer (Anthropic)',
+]
 
 const SOCIALS = [
   { label: 'GitHub', href: 'https://github.com/Kamesh22' },
@@ -110,6 +119,13 @@ function ExternalIcon() {
 }
 
 function Home() {
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [])
+
   return (
     <div className="home-shell" id="home">
       <header className="site-header">
@@ -129,6 +145,7 @@ function Home() {
           <button onClick={() => scrollToId('projects')}>Projects</button>
           <button onClick={() => scrollToId('experience')}>Experience</button>
           <button onClick={() => scrollToId('terminal-section')}>Terminal</button>
+          <button onClick={() => scrollToId('contact')}>Contact</button>
         </nav>
 
         <button className="icon-action" onClick={openResume} aria-label="Open resume" title="Open resume">
@@ -142,10 +159,18 @@ function Home() {
         <section className="hero-section">
           <div className="hero-copy">
             <p className="eyebrow">Backend engineer / Java / Spring Boot</p>
+            <div className="profile-strip">
+              <img
+                src={import.meta.env.BASE_URL + 'person/person.png'}
+                alt="Kamesh Rajaram"
+              />
+              <span>Systems Engineer at TCS, building secure backend services.</span>
+            </div>
             <h1>Kamesh Rajaram</h1>
             <p className="hero-lede">
-              I build secure Java microservices, production-ready APIs, and cloud-aware backend
-              systems with a practical eye for testing, observability, and clean service design.
+              I build secure Java microservices and production-ready APIs, then use Python
+              automation, Azure tools, and AI-assisted workflows to remove friction and ship
+              faster without losing engineering discipline.
             </p>
 
             <div className="hero-actions">
@@ -159,12 +184,24 @@ function Home() {
 
             <div className="hero-stats" aria-label="Career highlights">
               <span>
-                <strong>3000+</strong>
-                tests contributed
+                <strong>AI</strong>
+                Copilot-assisted delivery
               </span>
               <span>
-                <strong>3500+</strong>
-                cases migrated
+                <strong>Java</strong>
+                Spring Boot, Microservices, REST APIs
+              </span>
+              <span>
+                <strong>Azure</strong>
+                cloud and AI certified
+              </span>
+              <span>
+                <strong>Award</strong>
+                Star Team recognition
+              </span>
+              <span>
+                <strong>Claude Code</strong>
+                Claude Certified Developer
               </span>
               <span>
                 <strong>9.37</strong>
@@ -303,10 +340,11 @@ function Home() {
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div>
+      <footer className="site-footer" id="contact">
+        <div className="footer-copy">
           <strong>Ready to build reliable backend systems.</strong>
-          <p>Java, Spring Boot, microservices, API security, testing, and cloud observability.</p>
+          <p>Java, Spring Boot, Azure, API security, Python automation, and AI-assisted delivery.</p>
+          <small>Copyright {new Date().getFullYear()} Kamesh Rajaram. All rights reserved.</small>
         </div>
         <div className="footer-links">
           {SOCIALS.map((social) => (
